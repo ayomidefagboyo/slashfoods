@@ -62,7 +62,7 @@ export default function SignUpScreen({ navigation }: Props) {
         <View style={styles.header}>
           <Text style={styles.logo}>🍲</Text>
           <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join SlashFoods today!</Text>
+          <Text style={styles.subtitle}>Join Slash Foods today!</Text>
         </View>
 
         <View style={styles.form}>

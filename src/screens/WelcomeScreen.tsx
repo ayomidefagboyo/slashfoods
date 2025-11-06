@@ -11,7 +11,7 @@ export default function WelcomeScreen({ navigation }: Props) {
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.logo}>🍲</Text>
-        <Text style={styles.title}>SlashFoods</Text>
+        <Text style={styles.title}>Slash Foods</Text>
         <Text style={styles.subtitle}>Save Food. Save Money.</Text>
         <Text style={styles.description}>
           Discover delicious surprise packs from your favorite restaurants at amazing prices.

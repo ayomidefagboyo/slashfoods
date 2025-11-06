@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "SlashFoods",
-    "slug": "SlashFoods",
+    "name": "Slash Foods",
+    "slug": "slash-foods",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

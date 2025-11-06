@@ -96,11 +96,11 @@ export default function ProfileScreen() {
 
         <Card style={styles.card}>
           <Card.Content>
-            <Text style={styles.sectionTitle}>About SlashFoods</Text>
+            <Text style={styles.sectionTitle}>About Slash Foods</Text>
             <Divider style={styles.divider} />
 
             <Text style={styles.aboutText}>
-              SlashFoods helps you save money and reduce food waste by connecting you with
+              Slash Foods helps you save money and reduce food waste by connecting you with
               restaurants offering surprise packs of delicious leftover food at amazing prices.
             </Text>
 

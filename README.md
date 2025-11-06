@@ -1,8 +1,8 @@
-# SlashFoods 🍲
+# Slash Foods 🍲
 
 **Too Good To Go for Nigeria** - Save Food. Save Money.
 
-SlashFoods is a mobile app that connects users with restaurants offering surprise packs of delicious leftover food at amazing discounted prices (₦500-₦1,000). Help reduce food waste while enjoying quality meals!
+Slash Foods is a mobile app that connects users with restaurants offering surprise packs of delicious leftover food at amazing discounted prices (₦500-₦1,000). Help reduce food waste while enjoying quality meals!
 
 ## Features
 
