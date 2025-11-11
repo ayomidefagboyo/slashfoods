@@ -122,6 +122,9 @@ ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access to active partners" ON partners FOR SELECT USING (is_active = true);
 CREATE POLICY "Allow public read access to active deals" ON deals FOR SELECT USING (is_active = true);
 
+-- Allow authenticated users to insert their own partner records
+CREATE POLICY "Allow users to insert their own partner record" ON partners FOR INSERT WITH CHECK (auth.email() = email);
+
 -- Customers can only see their own orders
 CREATE POLICY "Customers can view their own orders" ON orders FOR SELECT USING (customer_email = current_setting('request.jwt.claims', true)::json->>'email');
 

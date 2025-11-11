@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Filter, Star, Clock, ShoppingBag, X, ChevronLeft, Heart, Navigation, CreditCard, Check, User, Phone, MapIcon, Info } from 'lucide-react';
+import { Search, MapPin, Filter, Star, Clock, ShoppingBag, X, ChevronLeft, ChevronRight, Heart, Navigation, CreditCard, Check, User, Phone, MapIcon, Info } from 'lucide-react';
 import { useFlutterwave } from 'react-flutterwave';
 import { getFlutterwaveConfig, handleFlutterwaveResponse, verifyPayment, type PaymentData, type PaymentResponse } from '../services/paymentService';
 import Logo from './Logo';
@@ -137,6 +137,96 @@ const deals: Deal[] = [
     coordinates: { lat: 6.4435, lng: 3.4653 },
     address: '8 Fola Osibo Street, Lekki Phase 1',
     description: 'Asian-inspired dishes including stir-fry, noodles, rice, and fusion specialties'
+  },
+  {
+    id: 5,
+    title: 'Lunch Special Box',
+    vendor: 'Quick Bite',
+    location: '23 Allen Avenue, Ikeja',
+    rating: 4.6,
+    reviews: 98,
+    originalPrice: 2000,
+    discountedPrice: 700,
+    discount: 65,
+    pickupTime: '12:00 PM - 2:00 PM',
+    distance: 2.1,
+    available: 2,
+    category: 'Restaurant',
+    coordinates: { lat: 6.6018, lng: 3.3515 },
+    address: '23 Allen Avenue, Ikeja',
+    description: 'Perfect lunch portions with rice, protein, and vegetables'
+  },
+  {
+    id: 6,
+    title: 'Fresh Bread Bundle',
+    vendor: 'Golden Crust Bakery',
+    location: '34 Herbert Macaulay, Yaba',
+    rating: 4.7,
+    reviews: 145,
+    originalPrice: 1800,
+    discountedPrice: 600,
+    discount: 67,
+    pickupTime: '6:00 PM - 8:00 PM',
+    distance: 3.2,
+    available: 1,
+    category: 'Bakery',
+    coordinates: { lat: 6.5164, lng: 3.3740 },
+    address: '34 Herbert Macaulay, Yaba',
+    description: 'Assorted fresh bread including wheat, white, and specialty loaves'
+  },
+  {
+    id: 7,
+    title: 'Grocery Surprise Bag',
+    vendor: 'FreshMart Supermarket',
+    location: '67 Admiralty Way, Lekki',
+    rating: 4.4,
+    reviews: 89,
+    originalPrice: 4000,
+    discountedPrice: 1500,
+    discount: 62,
+    pickupTime: '8:00 PM - 9:30 PM',
+    distance: 1.8,
+    available: 3,
+    category: 'Supermarket',
+    coordinates: { lat: 6.4308, lng: 3.4167 },
+    address: '67 Admiralty Way, Lekki',
+    description: 'Mix of fresh produce, pantry items, and dairy products'
+  },
+  {
+    id: 8,
+    title: 'Evening Dinner Bag',
+    vendor: 'Mama Cass Kitchen',
+    location: '12 Awolowo Road, Ikoyi',
+    rating: 4.8,
+    reviews: 167,
+    originalPrice: 3500,
+    discountedPrice: 1200,
+    discount: 66,
+    pickupTime: '7:30 PM - 9:00 PM',
+    distance: 1.5,
+    available: 2,
+    category: 'Restaurant',
+    coordinates: { lat: 6.4474, lng: 3.4553 },
+    address: '12 Awolowo Road, Ikoyi',
+    description: 'Traditional Nigerian dinner with jollof rice, proteins, and sides'
+  },
+  {
+    id: 9,
+    title: 'Cake & Pastry Box',
+    vendor: 'Sweet Treats Bakery',
+    location: '45 Opebi Road, Ikeja',
+    rating: 4.9,
+    reviews: 234,
+    originalPrice: 2800,
+    discountedPrice: 950,
+    discount: 66,
+    pickupTime: '6:30 PM - 8:30 PM',
+    distance: 2.7,
+    available: 1,
+    category: 'Bakery',
+    coordinates: { lat: 6.6018, lng: 3.3515 },
+    address: '45 Opebi Road, Ikeja',
+    description: 'Selection of cakes, cupcakes, and pastries'
   }
 ];
 
@@ -429,7 +519,7 @@ export default function CustomerInterface({ onNavigate }: CustomerInterfaceProps
       <div className="pt-20 sm:pt-32 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto pb-24">
 
         {/* Search and Filters */}
-        <div className="mb-8 sm:mb-12">
+        <div className="mb-4 sm:mb-6">
           <div className="flex flex-col md:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -500,47 +590,89 @@ export default function CustomerInterface({ onNavigate }: CustomerInterfaceProps
           </div>
         )}
 
-        {/* Results Header */}
-        <div className="mb-6 sm:mb-8 flex items-center justify-between">
-          <h2 className="text-xl sm:text-3xl font-bold text-gray-900">
-            Available Deals Near You
-          </h2>
-          <span className="text-sm sm:text-lg text-orange-500 font-semibold">({filteredDeals.length})</span>
-        </div>
-
-        {/* Deal Cards */}
+        {/* Deal Sections */}
         {filteredDeals.length > 0 ? (
-          <>
-            {/* Mobile: Horizontal Scroll */}
-            <div className="block sm:hidden">
-              <div className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide">
-                {filteredDeals.map((deal) => (
-                  <DealCardMobile
-                    key={deal.id}
-                    deal={deal}
-                    isFavorite={favorites.includes(deal.id)}
-                    onToggleFavorite={() => toggleFavorite(deal.id)}
-                    onReserve={() => handleReserveDeal(deal)}
-                    isReserved={reservedDeals.includes(deal.id)}
-                  />
-                ))}
-              </div>
-            </div>
+          <div className="space-y-8">
+            {/* Top Picks Near You */}
+            <DealSection
+              title="🔥 Top Picks Near You"
+              deals={filteredDeals.slice(0, 6)}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+              onReserve={handleReserveDeal}
+              reservedDeals={reservedDeals}
+            />
 
-            {/* Desktop: Grid Layout */}
-            <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {filteredDeals.map((deal) => (
-                <DealCard
-                  key={deal.id}
-                  deal={deal}
-                  isFavorite={favorites.includes(deal.id)}
-                  onToggleFavorite={() => toggleFavorite(deal.id)}
-                  onReserve={() => handleReserveDeal(deal)}
-                  isReserved={reservedDeals.includes(deal.id)}
-                />
-              ))}
-            </div>
-          </>
+            {/* Save Before It's Too Late */}
+            <DealSection
+              title="⏰ Save Before It's Too Late"
+              deals={filteredDeals.filter(deal => deal.available <= 3)}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+              onReserve={handleReserveDeal}
+              reservedDeals={reservedDeals}
+            />
+
+            {/* New Surprise Bags */}
+            <DealSection
+              title="✨ New Surprise Bags"
+              deals={filteredDeals.filter(deal => deal.title.toLowerCase().includes('surprise') || deal.title.toLowerCase().includes('bag'))}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+              onReserve={handleReserveDeal}
+              reservedDeals={reservedDeals}
+            />
+
+            {/* Meals */}
+            <DealSection
+              title="🍽️ Meals"
+              deals={filteredDeals.filter(deal => deal.category === 'Restaurant' || deal.title.toLowerCase().includes('meal') || deal.title.toLowerCase().includes('dinner'))}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+              onReserve={handleReserveDeal}
+              reservedDeals={reservedDeals}
+            />
+
+            {/* Collect for Lunch */}
+            <DealSection
+              title="🥙 Collect for Lunch"
+              deals={filteredDeals.filter(deal => deal.pickupTime.includes('12:') || deal.pickupTime.includes('1:') || deal.title.toLowerCase().includes('lunch'))}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+              onReserve={handleReserveDeal}
+              reservedDeals={reservedDeals}
+            />
+
+            {/* Collect for Dinner */}
+            <DealSection
+              title="🍽️ Collect for Dinner"
+              deals={filteredDeals.filter(deal => deal.pickupTime.includes('6:') || deal.pickupTime.includes('7:') || deal.pickupTime.includes('8:') || deal.title.toLowerCase().includes('dinner'))}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+              onReserve={handleReserveDeal}
+              reservedDeals={reservedDeals}
+            />
+
+            {/* Baked Goods */}
+            <DealSection
+              title="🥖 Baked Goods"
+              deals={filteredDeals.filter(deal => deal.category === 'Bakery' || deal.title.toLowerCase().includes('bread') || deal.title.toLowerCase().includes('cake'))}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+              onReserve={handleReserveDeal}
+              reservedDeals={reservedDeals}
+            />
+
+            {/* Groceries */}
+            <DealSection
+              title="🛒 Groceries"
+              deals={filteredDeals.filter(deal => deal.category === 'Supermarket' || deal.title.toLowerCase().includes('grocery'))}
+              favorites={favorites}
+              onToggleFavorite={toggleFavorite}
+              onReserve={handleReserveDeal}
+              reservedDeals={reservedDeals}
+            />
+          </div>
         ) : (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -625,10 +757,10 @@ function DealCard({ deal, isFavorite, onToggleFavorite, onReserve, isReserved }:
   isReserved: boolean;
 }) {
   return (
-    <div className="group bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-xl hover:shadow-gray-900/10 transition-all duration-300 hover:-translate-y-1">
+    <div className="flex-shrink-0 w-80 group bg-white border border-gray-100 rounded-3xl overflow-hidden hover:shadow-xl hover:shadow-gray-900/10 transition-all duration-300 hover:-translate-y-1 snap-start cursor-pointer" onClick={() => onReserve()}>
       {/* Image Container */}
       <div className="relative">
-        <div className="aspect-[3/2] bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+        <div className="aspect-[2/1] bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
           <ShoppingBag className="w-12 h-12 text-orange-300" />
         </div>
 
@@ -639,7 +771,10 @@ function DealCard({ deal, isFavorite, onToggleFavorite, onReserve, isReserved }:
 
         {/* Favorite Button */}
         <button
-          onClick={onToggleFavorite}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite();
+          }}
           className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all shadow-lg"
         >
           <Heart className={`w-5 h-5 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
@@ -653,60 +788,42 @@ function DealCard({ deal, isFavorite, onToggleFavorite, onReserve, isReserved }:
 
       {/* Content */}
       <div className="p-6">
-        {/* Title and Vendor */}
+        {/* Title */}
         <div className="mb-3">
-          <h3 className="text-gray-900 font-bold text-lg mb-1">{deal.title}</h3>
-          <p className="text-gray-600 font-medium text-sm">{deal.vendor}</p>
+          <h3 className="text-gray-900 font-bold text-base mb-1">{deal.title}</h3>
         </div>
 
-        {/* Rating and Distance */}
-        <div className="flex items-center space-x-3 mb-3 text-sm">
-          <div className="flex items-center">
-            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 mr-1.5" />
-            <span className="text-gray-900 font-semibold">{deal.rating}</span>
-            <span className="text-gray-500 ml-1">({deal.reviews})</span>
+        {/* Vendor with Star Rating */}
+        <div className="flex items-center mb-3">
+          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 mr-1" />
+          <span className="text-gray-900 font-medium text-sm mr-2">{deal.rating}</span>
+          <span className="text-gray-600 font-medium text-sm">{deal.vendor}</span>
+        </div>
+
+        {/* Pickup Time and Distance on same line */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center text-gray-600">
+            <Clock className="w-4 h-4 mr-1 text-orange-500" />
+            <span className="font-medium text-sm">{deal.pickupTime}</span>
           </div>
-          <span className="text-gray-300">•</span>
-          <div className="flex items-center">
-            <MapPin className="w-4 h-4 mr-1.5 text-orange-500" />
-            <span className="text-gray-600 font-medium">{deal.distance.toFixed(1)} km</span>
+          <div className="flex items-center text-gray-600">
+            <MapPin className="w-4 h-4 mr-1 text-orange-500" />
+            <span className="font-medium text-sm">{deal.distance.toFixed(1)} km</span>
           </div>
         </div>
 
-        {/* Pickup Time */}
-        <div className="flex items-center text-gray-600 text-sm mb-4">
-          <Clock className="w-4 h-4 mr-1.5 text-orange-500" />
-          <span className="font-medium">Pickup: {deal.pickupTime}</span>
-        </div>
-
-        {/* Price and Reserve Button */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="flex items-baseline space-x-2">
-            <span className="text-gray-900 font-bold text-xl">₦{deal.discountedPrice.toLocaleString()}</span>
-            <span className="text-gray-500 text-base line-through">₦{deal.originalPrice.toLocaleString()}</span>
+        {/* Price */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <span className="text-gray-900 font-bold text-base">₦{deal.discountedPrice.toLocaleString()}</span>
+            <span className="text-gray-500 text-sm line-through">₦{deal.originalPrice.toLocaleString()}</span>
           </div>
-          <button
-            onClick={onReserve}
-            disabled={deal.available === 0 || isReserved}
-            className={`px-6 py-3 rounded-2xl font-semibold transition-all transform group-hover:scale-105 shadow-lg ${
-              isReserved
-                ? 'bg-green-500 text-white cursor-not-allowed'
-                : deal.available === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-orange-500 text-white hover:bg-orange-600 shadow-orange-500/25'
-            }`}
-          >
-            {isReserved ? (
-              <div className="flex items-center space-x-2">
-                <Check className="w-4 h-4" />
-                <span>Reserved</span>
-              </div>
-            ) : deal.available === 0 ? (
-              'Sold Out'
-            ) : (
-              'Reserve'
-            )}
-          </button>
+          {isReserved && (
+            <div className="flex items-center text-green-600">
+              <Check className="w-4 h-4 mr-1" />
+              <span className="text-sm font-medium">Reserved</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -722,86 +839,73 @@ function DealCardMobile({ deal, isFavorite, onToggleFavorite, onReserve, isReser
   isReserved: boolean;
 }) {
   return (
-    <div className="flex-shrink-0 w-44 bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all">
-      {/* Image Container - Smaller aspect ratio for mobile */}
+    <div className="flex-shrink-0 w-64 bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all snap-start cursor-pointer" onClick={() => onReserve()}>
+      {/* Image Container */}
       <div className="relative">
-        <div className="aspect-[3/2] bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+        <div className="aspect-[2/1] bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
           <ShoppingBag className="w-8 h-8 text-orange-300" />
         </div>
 
-        {/* Compact Discount Badge */}
-        <div className="absolute top-2 left-2 bg-orange-500 text-white px-1.5 py-0.5 rounded-md text-xs font-bold">
+        {/* Discount Badge */}
+        <div className="absolute top-3 left-3 bg-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold">
           -{deal.discount}%
         </div>
 
-        {/* Compact Favorite Button */}
+        {/* Favorite Button */}
         <button
-          onClick={onToggleFavorite}
-          className="absolute top-2 right-2 p-1 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleFavorite();
+          }}
+          className="absolute top-3 right-3 p-1.5 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all"
         >
-          <Heart className={`w-3 h-3 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
+          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-red-500 text-red-500' : 'text-gray-400'}`} />
         </button>
 
         {/* Stock Indicator */}
-        <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-white/90 backdrop-blur-sm rounded-md text-orange-600 text-xs font-semibold">
+        <div className="absolute bottom-3 right-3 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-orange-600 text-xs font-semibold">
           {deal.available} left
         </div>
       </div>
 
-      {/* Compact Content */}
-      <div className="p-3">
-        {/* Title and Vendor - More compact */}
+      {/* Content */}
+      <div className="p-4">
+        {/* Title */}
         <div className="mb-2">
           <h3 className="text-gray-900 font-bold text-sm mb-1 line-clamp-1">{deal.title}</h3>
-          <p className="text-gray-600 font-medium text-xs line-clamp-1">{deal.vendor}</p>
         </div>
 
-        {/* Rating and Distance - Compact */}
+        {/* Vendor with Star Rating */}
+        <div className="flex items-center mb-2">
+          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
+          <span className="text-gray-900 font-medium text-xs mr-1">{deal.rating}</span>
+          <span className="text-gray-600 font-medium text-xs line-clamp-1">{deal.vendor}</span>
+        </div>
+
+        {/* Pickup Time and Distance on same line */}
         <div className="flex items-center justify-between mb-2 text-xs">
-          <div className="flex items-center">
-            <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
-            <span className="text-gray-900 font-semibold">{deal.rating}</span>
+          <div className="flex items-center text-gray-600">
+            <Clock className="w-3 h-3 mr-1 text-orange-500" />
+            <span className="font-medium">{deal.pickupTime}</span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center text-gray-600">
             <MapPin className="w-3 h-3 mr-1 text-orange-500" />
-            <span className="text-gray-600 font-medium">{deal.distance.toFixed(1)} km</span>
+            <span className="font-medium">{deal.distance.toFixed(1)} km</span>
           </div>
         </div>
 
-        {/* Compact Pickup Time */}
-        <div className="flex items-center text-gray-600 text-xs mb-2">
-          <Clock className="w-3 h-3 mr-1 text-orange-500" />
-          <span className="font-medium line-clamp-1">{deal.pickupTime}</span>
-        </div>
-
-        {/* Price and Reserve Button - Compact */}
+        {/* Price */}
         <div className="flex items-center justify-between">
-          <div className="flex flex-col">
+          <div className="flex items-center space-x-2">
             <span className="text-gray-900 font-bold text-sm">₦{deal.discountedPrice.toLocaleString()}</span>
             <span className="text-gray-500 text-xs line-through">₦{deal.originalPrice.toLocaleString()}</span>
           </div>
-          <button
-            onClick={onReserve}
-            disabled={deal.available === 0 || isReserved}
-            className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition-all ${
-              isReserved
-                ? 'bg-green-500 text-white cursor-not-allowed'
-                : deal.available === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-orange-500 text-white hover:bg-orange-600'
-            }`}
-          >
-            {isReserved ? (
-              <div className="flex items-center space-x-1">
-                <Check className="w-3 h-3" />
-                <span>Reserved</span>
-              </div>
-            ) : deal.available === 0 ? (
-              'Sold Out'
-            ) : (
-              'Reserve'
-            )}
-          </button>
+          {isReserved && (
+            <div className="flex items-center text-green-600">
+              <Check className="w-3 h-3 mr-1" />
+              <span className="text-xs font-medium">Reserved</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -827,10 +931,10 @@ function ReservationModal({ deal, onClose, onConfirm }: {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl p-8 max-w-md w-full border border-gray-100">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Reserve Deal</h2>
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center sm:items-center items-end justify-center z-50 p-0 sm:p-4">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl p-4 sm:p-8 max-w-md w-full border border-gray-100 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Reserve Deal</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-50 rounded-xl transition-colors"
@@ -840,88 +944,84 @@ function ReservationModal({ deal, onClose, onConfirm }: {
         </div>
 
         {/* Deal Summary */}
-        <div className="bg-gray-50 rounded-2xl p-4 mb-6">
-          <h3 className="font-bold text-gray-900 mb-2">{deal.title}</h3>
-          <p className="text-gray-600 text-sm mb-3">{deal.vendor}</p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-gray-900">₦{deal.discountedPrice.toLocaleString()}</span>
-              <span className="text-gray-500 line-through">₦{deal.originalPrice.toLocaleString()}</span>
+        <div className="bg-gray-50 rounded-2xl p-3 sm:p-4 mb-4 sm:mb-6">
+          <h3 className="font-bold text-gray-900 mb-1 text-sm sm:text-base">{deal.title}</h3>
+          <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3">{deal.vendor}</p>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <span className="text-lg sm:text-2xl font-bold text-gray-900">₦{deal.discountedPrice.toLocaleString()}</span>
+              <span className="text-gray-500 line-through text-sm">₦{deal.originalPrice.toLocaleString()}</span>
             </div>
-            <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+            <span className="bg-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold">
               -{deal.discount}% OFF
             </span>
           </div>
-          <div className="flex items-center mt-3 text-sm text-gray-600">
-            <Clock className="w-4 h-4 mr-1.5 text-orange-500" />
+          <div className="flex items-center text-xs sm:text-sm text-gray-600">
+            <Clock className="w-3 sm:w-4 h-3 sm:h-4 mr-1.5 text-orange-500" />
             <span>Pickup: {deal.pickupTime}</span>
           </div>
-          <div className="flex items-center mt-2 text-sm text-gray-600">
-            <MapPin className="w-4 h-4 mr-1.5 text-orange-500" />
-            <span>{deal.address}</span>
-          </div>
 
-          {/* What's Included Tooltip */}
-          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          {/* What's Included Tooltip - Compact for mobile */}
+          <div className="mt-2 sm:mt-3 p-2 sm:p-3 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="flex items-center space-x-2 mb-1">
-              <Info className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-semibold text-blue-900">What you could get:</span>
+              <Info className="w-3 sm:w-4 h-3 sm:h-4 text-blue-500" />
+              <span className="text-xs sm:text-sm font-semibold text-blue-900">What you could get:</span>
             </div>
-            <p className="text-sm text-blue-800">{deal.description}</p>
+            <p className="text-xs sm:text-sm text-blue-800">{deal.description}</p>
           </div>
         </div>
 
         {/* Customer Details Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
-            <label className="text-gray-700 font-semibold text-sm mb-2 block">Name</label>
+            <label className="text-gray-700 font-semibold text-xs sm:text-sm mb-1 sm:mb-2 block">Name</label>
             <input
               type="text"
               value={customerDetails.name}
               onChange={(e) => setCustomerDetails(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-300 transition-all"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm sm:text-base focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-300 transition-all"
               placeholder="Enter your name"
               required
             />
           </div>
 
           <div>
-            <label className="text-gray-700 font-semibold text-sm mb-2 block">Email</label>
+            <label className="text-gray-700 font-semibold text-xs sm:text-sm mb-1 sm:mb-2 block">Email</label>
             <input
               type="email"
               value={customerDetails.email}
               onChange={(e) => setCustomerDetails(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-300 transition-all"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm sm:text-base focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-300 transition-all"
               placeholder="Enter your email"
               required
             />
           </div>
 
           <div>
-            <label className="text-gray-700 font-semibold text-sm mb-2 block">Phone</label>
+            <label className="text-gray-700 font-semibold text-xs sm:text-sm mb-1 sm:mb-2 block">Phone</label>
             <input
               type="tel"
               value={customerDetails.phone}
               onChange={(e) => setCustomerDetails(prev => ({ ...prev, phone: e.target.value }))}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-300 transition-all"
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm sm:text-base focus:outline-none focus:border-orange-300 focus:ring-1 focus:ring-orange-300 transition-all"
               placeholder="Enter your phone"
               required
             />
           </div>
 
-          <div className="flex space-x-4 pt-4">
+          <div className="flex space-x-3 sm:space-x-4 pt-3 sm:pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-6 py-3 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-semibold transition-all"
+              className="flex-1 px-4 sm:px-6 py-2 sm:py-3 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-semibold text-sm sm:text-base transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/25 flex items-center justify-center space-x-2"
+              className="flex-1 px-4 sm:px-6 py-2 sm:py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/25 flex items-center justify-center space-x-1 sm:space-x-2 text-sm sm:text-base"
             >
-              <CreditCard className="w-5 h-5" />
+              <CreditCard className="w-4 sm:w-5 h-4 sm:h-5" />
               <span>Pay</span>
             </button>
           </div>
@@ -1282,6 +1382,96 @@ function LocationModal({ currentAddress, isLoadingLocation, locationPermission, 
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Deal Section Component
+function DealSection({ title, deals, favorites, onToggleFavorite, onReserve, reservedDeals }: {
+  title: string;
+  deals: Deal[];
+  favorites: number[];
+  onToggleFavorite: (id: number) => void;
+  onReserve: (deal: Deal) => void;
+  reservedDeals: number[];
+}) {
+  if (deals.length === 0) return null;
+
+  const scrollLeft = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.scrollBy({ left: 300, behavior: 'smooth' });
+    }
+  };
+
+  const sectionId = title.replace(/\s+/g, '-').toLowerCase();
+
+  return (
+    <div className="mb-8">
+      {/* Section Header */}
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-lg font-bold text-gray-900">{title}</h3>
+        <span className="text-sm text-orange-500 font-semibold">({deals.length})</span>
+      </div>
+
+      {/* Mobile: Horizontal Scroll */}
+      <div className="block sm:hidden">
+        <div className="flex space-x-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
+          {deals.map((deal) => (
+            <DealCardMobile
+              key={deal.id}
+              deal={deal}
+              isFavorite={favorites.includes(deal.id)}
+              onToggleFavorite={() => onToggleFavorite(deal.id)}
+              onReserve={() => onReserve(deal)}
+              isReserved={reservedDeals.includes(deal.id)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop: Horizontal Scroll with Arrows */}
+      <div className="hidden sm:block relative">
+        {/* Left Arrow */}
+        <button
+          onClick={() => scrollLeft(`${sectionId}-desktop`)}
+          className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full p-3 shadow-lg hover:bg-white hover:shadow-xl transition-all"
+        >
+          <ChevronLeft className="w-5 h-5 text-gray-600" />
+        </button>
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => scrollRight(`${sectionId}-desktop`)}
+          className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full p-3 shadow-lg hover:bg-white hover:shadow-xl transition-all"
+        >
+          <ChevronRight className="w-5 h-5 text-gray-600" />
+        </button>
+
+        {/* Scrollable Container */}
+        <div
+          id={`${sectionId}-desktop`}
+          className="flex space-x-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory"
+        >
+          {deals.map((deal) => (
+            <DealCard
+              key={deal.id}
+              deal={deal}
+              isFavorite={favorites.includes(deal.id)}
+              onToggleFavorite={() => onToggleFavorite(deal.id)}
+              onReserve={() => onReserve(deal)}
+              isReserved={reservedDeals.includes(deal.id)}
+            />
+          ))}
         </div>
       </div>
     </div>
