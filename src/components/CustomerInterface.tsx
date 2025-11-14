@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Filter, Star, Clock, ShoppingBag, X, ChevronLeft, ChevronRight, Heart, Navigation, CreditCard, Check, User, Phone, MapIcon, Info } from 'lucide-react';
+import { Search, MapPin, Filter, Star, Clock, ShoppingBag, X, ChevronLeft, ChevronRight, Heart, Navigation, CreditCard, Check, User, Phone, MapIcon, Info, ChevronDown, ChevronUp, Plus, Minus, QrCode } from 'lucide-react';
+import QRCode from 'qrcode';
 import { useFlutterwave } from 'react-flutterwave';
 import { getFlutterwaveConfig, handleFlutterwaveResponse, verifyPayment, type PaymentData, type PaymentResponse } from '../services/paymentService';
 import Logo from './Logo';
@@ -40,7 +41,7 @@ const deals: Deal[] = [
     originalPrice: 2500,
     discountedPrice: 750,
     discount: 70,
-    pickupTime: '7:00 PM - 9:00 PM',
+    pickupTime: '19:00 - 21:00',
     distance: 1.2,
     available: 5,
     category: 'Restaurant',
@@ -58,7 +59,7 @@ const deals: Deal[] = [
     originalPrice: 3000,
     discountedPrice: 900,
     discount: 70,
-    pickupTime: '8:00 PM - 10:00 PM',
+    pickupTime: '20:00 - 22:00',
     distance: 2.1,
     available: 8,
     category: 'Bakery',
@@ -76,7 +77,7 @@ const deals: Deal[] = [
     originalPrice: 4500,
     discountedPrice: 1350,
     discount: 70,
-    pickupTime: '9:00 PM - 11:00 PM',
+    pickupTime: '21:00 - 23:00',
     distance: 0.8,
     available: 3,
     category: 'Restaurant',
@@ -94,7 +95,7 @@ const deals: Deal[] = [
     originalPrice: 1800,
     discountedPrice: 600,
     discount: 67,
-    pickupTime: '6:00 PM - 8:00 PM',
+    pickupTime: '18:00 - 20:00',
     distance: 3.5,
     available: 12,
     category: 'Local Cuisine',
@@ -112,7 +113,7 @@ const deals: Deal[] = [
     originalPrice: 5000,
     discountedPrice: 1500,
     discount: 70,
-    pickupTime: '8:30 PM - 9:30 PM',
+    pickupTime: '20:30 - 21:30',
     distance: 4.2,
     available: 15,
     category: 'Supermarket',
@@ -130,7 +131,7 @@ const deals: Deal[] = [
     originalPrice: 3500,
     discountedPrice: 1050,
     discount: 70,
-    pickupTime: '7:30 PM - 9:30 PM',
+    pickupTime: '19:30 - 21:30',
     distance: 2.3,
     available: 6,
     category: 'Restaurant',
@@ -148,7 +149,7 @@ const deals: Deal[] = [
     originalPrice: 2000,
     discountedPrice: 700,
     discount: 65,
-    pickupTime: '12:00 PM - 2:00 PM',
+    pickupTime: '12:00 - 14:00',
     distance: 2.1,
     available: 2,
     category: 'Restaurant',
@@ -166,7 +167,7 @@ const deals: Deal[] = [
     originalPrice: 1800,
     discountedPrice: 600,
     discount: 67,
-    pickupTime: '6:00 PM - 8:00 PM',
+    pickupTime: '18:00 - 20:00',
     distance: 3.2,
     available: 1,
     category: 'Bakery',
@@ -184,7 +185,7 @@ const deals: Deal[] = [
     originalPrice: 4000,
     discountedPrice: 1500,
     discount: 62,
-    pickupTime: '8:00 PM - 9:30 PM',
+    pickupTime: '20:00 - 21:30',
     distance: 1.8,
     available: 3,
     category: 'Supermarket',
@@ -202,7 +203,7 @@ const deals: Deal[] = [
     originalPrice: 3500,
     discountedPrice: 1200,
     discount: 66,
-    pickupTime: '7:30 PM - 9:00 PM',
+    pickupTime: '19:30 - 21:00',
     distance: 1.5,
     available: 2,
     category: 'Restaurant',
@@ -220,7 +221,7 @@ const deals: Deal[] = [
     originalPrice: 2800,
     discountedPrice: 950,
     discount: 66,
-    pickupTime: '6:30 PM - 8:30 PM',
+    pickupTime: '18:30 - 20:30',
     distance: 2.7,
     available: 1,
     category: 'Bakery',
@@ -240,7 +241,10 @@ export default function CustomerInterface({ onNavigate }: CustomerInterfaceProps
   const [locationPermission, setLocationPermission] = useState<'granted' | 'denied' | 'prompt'>('prompt');
   const [selectedDeal, setSelectedDeal] = useState<Deal | null>(null);
   const [showReservationModal, setShowReservationModal] = useState(false);
-  const [reservedDeals, setReservedDeals] = useState<number[]>([]);
+  const [showDealDetailsModal, setShowDealDetailsModal] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [reservedDeals, setReservedDeals] = useState<{id: number, quantity: number}[]>([]);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [showLocationModal, setShowLocationModal] = useState(false);
 
@@ -449,7 +453,37 @@ export default function CustomerInterface({ onNavigate }: CustomerInterfaceProps
 
   const handleReserveDeal = (deal: Deal) => {
     setSelectedDeal(deal);
-    setShowReservationModal(true);
+    setQuantity(1);
+    setIsExpanded(false);
+    setShowDealDetailsModal(true);
+  };
+
+  const handleProceedToReservation = () => {
+    if (selectedDeal) {
+      // Add to reserved deals with quantity
+      const existingDealIndex = reservedDeals.findIndex(item => item.id === selectedDeal.id);
+      if (existingDealIndex >= 0) {
+        // Update existing quantity
+        setReservedDeals(prev => prev.map((item, index) =>
+          index === existingDealIndex
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        ));
+      } else {
+        // Add new deal with quantity
+        setReservedDeals(prev => [...prev, { id: selectedDeal.id, quantity }]);
+      }
+
+      // Update available quantity
+      const dealIndex = deals.findIndex(d => d.id === selectedDeal.id);
+      if (dealIndex >= 0) {
+        deals[dealIndex].available = Math.max(0, deals[dealIndex].available - quantity);
+      }
+      // Close modal and go directly to checkout
+      setShowDealDetailsModal(false);
+      setSelectedDeal(null);
+      setShowCheckout(true);
+    }
   };
 
   const confirmReservation = (customerDetails: {name: string; email: string; phone: string}) => {
@@ -636,7 +670,7 @@ export default function CustomerInterface({ onNavigate }: CustomerInterfaceProps
             {/* Collect for Lunch */}
             <DealSection
               title="🥙 Collect for Lunch"
-              deals={filteredDeals.filter(deal => deal.pickupTime.includes('12:') || deal.pickupTime.includes('1:') || deal.title.toLowerCase().includes('lunch'))}
+              deals={filteredDeals.filter(deal => deal.pickupTime.includes('12:') || deal.pickupTime.includes('13:') || deal.pickupTime.includes('14:') || deal.title.toLowerCase().includes('lunch'))}
               favorites={favorites}
               onToggleFavorite={toggleFavorite}
               onReserve={handleReserveDeal}
@@ -646,7 +680,7 @@ export default function CustomerInterface({ onNavigate }: CustomerInterfaceProps
             {/* Collect for Dinner */}
             <DealSection
               title="🍽️ Collect for Dinner"
-              deals={filteredDeals.filter(deal => deal.pickupTime.includes('6:') || deal.pickupTime.includes('7:') || deal.pickupTime.includes('8:') || deal.title.toLowerCase().includes('dinner'))}
+              deals={filteredDeals.filter(deal => deal.pickupTime.includes('18:') || deal.pickupTime.includes('19:') || deal.pickupTime.includes('20:') || deal.pickupTime.includes('21:') || deal.title.toLowerCase().includes('dinner'))}
               favorites={favorites}
               onToggleFavorite={toggleFavorite}
               onReserve={handleReserveDeal}
@@ -693,6 +727,19 @@ export default function CustomerInterface({ onNavigate }: CustomerInterfaceProps
         )}
       </div>
 
+      {/* Deal Details Modal */}
+      {showDealDetailsModal && selectedDeal && (
+        <DealDetailsModal
+          deal={selectedDeal}
+          quantity={quantity}
+          isExpanded={isExpanded}
+          onClose={() => setShowDealDetailsModal(false)}
+          onQuantityChange={setQuantity}
+          onToggleExpanded={() => setIsExpanded(!isExpanded)}
+          onProceed={handleProceedToReservation}
+        />
+      )}
+
       {/* Reservation Modal */}
       {showReservationModal && selectedDeal && (
         <ReservationModal
@@ -706,9 +753,12 @@ export default function CustomerInterface({ onNavigate }: CustomerInterfaceProps
       {/* Checkout Modal */}
       {showCheckout && (
         <CheckoutModal
-          reservedDeals={reservedDeals.map(id => deals.find(deal => deal.id === id)!).filter(Boolean)}
+          reservedDeals={reservedDeals.map(item => ({
+            deal: deals.find(deal => deal.id === item.id)!,
+            quantity: item.quantity
+          })).filter(item => item.deal)}
           customerInfo={customerInfo}
-          onClose={() => setShowCheckout(false)}
+          onBack={() => setShowCheckout(false)}
           onOrderComplete={(orderDetails) => {
             setOrderDetails(orderDetails);
             setShowCheckout(false);
@@ -793,18 +843,20 @@ function DealCard({ deal, isFavorite, onToggleFavorite, onReserve, isReserved }:
           <h3 className="text-gray-900 font-bold text-base mb-1">{deal.title}</h3>
         </div>
 
-        {/* Vendor with Star Rating */}
+        {/* Vendor and Star Rating */}
         <div className="flex items-center mb-3">
-          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 mr-1" />
-          <span className="text-gray-900 font-medium text-sm mr-2">{deal.rating}</span>
-          <span className="text-gray-600 font-medium text-sm">{deal.vendor}</span>
+          <span className="text-gray-600 font-medium text-sm mr-2">{deal.vendor}</span>
+          <div className="flex items-center">
+            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 mr-1" />
+            <span className="text-gray-900 font-medium text-sm">{deal.rating}</span>
+          </div>
         </div>
 
         {/* Pickup Time and Distance on same line */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center text-gray-600">
             <Clock className="w-4 h-4 mr-1 text-orange-500" />
-            <span className="font-medium text-sm">{deal.pickupTime}</span>
+            <span className="font-medium text-sm">Pickup by {deal.pickupTime}</span>
           </div>
           <div className="flex items-center text-gray-600">
             <MapPin className="w-4 h-4 mr-1 text-orange-500" />
@@ -812,18 +864,21 @@ function DealCard({ deal, isFavorite, onToggleFavorite, onReserve, isReserved }:
           </div>
         </div>
 
-        {/* Price */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-900 font-bold text-base">₦{deal.discountedPrice.toLocaleString()}</span>
-            <span className="text-gray-500 text-sm line-through">₦{deal.originalPrice.toLocaleString()}</span>
-          </div>
-          {isReserved && (
-            <div className="flex items-center text-green-600">
-              <Check className="w-4 h-4 mr-1" />
-              <span className="text-sm font-medium">Reserved</span>
+        {/* Divider */}
+        <div className="border-t border-gray-100 pt-3 mt-3">
+          {/* Price */}
+          <div className="flex items-center justify-end">
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-900 font-bold text-base">₦{deal.discountedPrice.toLocaleString()}</span>
+              <span className="text-gray-500 text-sm line-through">₦{deal.originalPrice.toLocaleString()}</span>
             </div>
-          )}
+            {isReserved && (
+              <div className="flex items-center text-green-600 ml-3">
+                <Check className="w-4 h-4 mr-1" />
+                <span className="text-sm font-medium">Reserved</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -875,18 +930,20 @@ function DealCardMobile({ deal, isFavorite, onToggleFavorite, onReserve, isReser
           <h3 className="text-gray-900 font-bold text-sm mb-1 line-clamp-1">{deal.title}</h3>
         </div>
 
-        {/* Vendor with Star Rating */}
+        {/* Vendor and Star Rating */}
         <div className="flex items-center mb-2">
-          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
-          <span className="text-gray-900 font-medium text-xs mr-1">{deal.rating}</span>
-          <span className="text-gray-600 font-medium text-xs line-clamp-1">{deal.vendor}</span>
+          <span className="text-gray-600 font-medium text-xs line-clamp-1 mr-2">{deal.vendor}</span>
+          <div className="flex items-center">
+            <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 mr-1" />
+            <span className="text-gray-900 font-medium text-xs">{deal.rating}</span>
+          </div>
         </div>
 
         {/* Pickup Time and Distance on same line */}
         <div className="flex items-center justify-between mb-2 text-xs">
           <div className="flex items-center text-gray-600">
             <Clock className="w-3 h-3 mr-1 text-orange-500" />
-            <span className="font-medium">{deal.pickupTime}</span>
+            <span className="font-medium">Pickup by {deal.pickupTime}</span>
           </div>
           <div className="flex items-center text-gray-600">
             <MapPin className="w-3 h-3 mr-1 text-orange-500" />
@@ -894,18 +951,168 @@ function DealCardMobile({ deal, isFavorite, onToggleFavorite, onReserve, isReser
           </div>
         </div>
 
-        {/* Price */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <span className="text-gray-900 font-bold text-sm">₦{deal.discountedPrice.toLocaleString()}</span>
-            <span className="text-gray-500 text-xs line-through">₦{deal.originalPrice.toLocaleString()}</span>
+        {/* Divider */}
+        <div className="border-t border-gray-100 pt-2 mt-2">
+          {/* Price */}
+          <div className="flex items-center justify-end">
+            {isReserved ? (
+              <div className="flex items-center text-green-600">
+                <Check className="w-3 h-3 mr-1" />
+                <span className="text-xs font-medium">Reserved</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <span className="text-gray-500 text-xs line-through">₦{deal.originalPrice.toLocaleString()}</span>
+                <span className="text-gray-900 font-bold text-sm">₦{deal.discountedPrice.toLocaleString()}</span>
+              </div>
+            )}
           </div>
-          {isReserved && (
-            <div className="flex items-center text-green-600">
-              <Check className="w-3 h-3 mr-1" />
-              <span className="text-xs font-medium">Reserved</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DealDetailsModal({ deal, quantity, isExpanded, onClose, onQuantityChange, onToggleExpanded, onProceed }: {
+  deal: Deal;
+  quantity: number;
+  isExpanded: boolean;
+  onClose: () => void;
+  onQuantityChange: (quantity: number) => void;
+  onToggleExpanded: () => void;
+  onProceed: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg max-h-[90vh] overflow-hidden animate-slide-up sm:animate-scale-up">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-100">
+          <h2 className="text-xl font-bold text-gray-900">Deal Details</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-600" />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto max-h-[calc(90vh-200px)]">
+          {/* Deal Image */}
+          <div className="relative">
+            <div className="aspect-[2/1] bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center">
+              <ShoppingBag className="w-16 h-16 text-orange-300" />
             </div>
-          )}
+
+            {/* Discount Badge */}
+            <div className="absolute top-4 left-4 bg-orange-500 text-white px-3 py-1.5 rounded-full text-sm font-bold">
+              -{deal.discount}% OFF
+            </div>
+
+            {/* Stock Indicator */}
+            <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full text-orange-600 text-sm font-semibold shadow-lg">
+              {deal.available} left
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-4">
+            {/* Title with Price */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xl font-bold text-gray-900">{deal.title}</h3>
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-900 font-bold text-lg">₦{deal.discountedPrice.toLocaleString()}</span>
+                  <span className="text-gray-500 text-sm line-through">₦{deal.originalPrice.toLocaleString()}</span>
+                </div>
+              </div>
+              <div className="flex items-center">
+                <span className="text-gray-600 font-medium mr-2">{deal.vendor}</span>
+                <div className="flex items-center">
+                  <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 mr-1" />
+                  <span className="text-gray-900 font-medium">{deal.rating}</span>
+                  <span className="text-gray-500 ml-1">({deal.reviews} reviews)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Description Section */}
+            <div className="mb-4">
+              <div className="mb-2">
+                <h4 className="font-semibold text-gray-900 mb-2">What you could get</h4>
+                <div className="relative">
+                  <p className={`text-gray-700 leading-relaxed ${!isExpanded ? 'line-clamp-3' : ''}`}>
+                    {deal.description}
+                  </p>
+
+                  {/* Show expand button if description is long enough */}
+                  {deal.description.length > 150 && (
+                    <button
+                      onClick={onToggleExpanded}
+                      className="mt-2 flex items-center text-orange-500 hover:text-orange-600 transition-colors font-medium text-sm"
+                    >
+                      {isExpanded ? (
+                        <>
+                          <span>Show less</span>
+                          <ChevronUp className="w-4 h-4 ml-1" />
+                        </>
+                      ) : (
+                        <>
+                          <span>Read more</span>
+                          <ChevronDown className="w-4 h-4 ml-1" />
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Pickup Details */}
+            <div className="mb-4 space-y-2">
+              <div className="flex items-center text-gray-600">
+                <Clock className="w-4 h-4 mr-2 text-orange-500" />
+                <span className="font-medium">Pickup by {deal.pickupTime}</span>
+              </div>
+              <div className="flex items-center text-gray-600">
+                <MapPin className="w-4 h-4 mr-2 text-orange-500" />
+                <span className="font-medium">{deal.distance.toFixed(1)} km • {deal.address}</span>
+              </div>
+            </div>
+
+            {/* Quantity Selector */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1}
+                  className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+
+                <span className="text-xl font-semibold min-w-[3rem] text-center">{quantity}</span>
+
+                <button
+                  onClick={() => onQuantityChange(Math.min(deal.available, quantity + 1))}
+                  disabled={quantity >= deal.available}
+                  className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-100 bg-white">
+          <button
+            onClick={onProceed}
+            className="w-full bg-orange-500 text-white py-3 px-6 rounded-xl font-semibold hover:bg-orange-600 transition-colors"
+          >
+            Reserve {quantity} item{quantity > 1 ? 's' : ''} • ₦{(deal.discountedPrice * quantity).toLocaleString()}
+          </button>
         </div>
       </div>
     </div>
@@ -958,7 +1165,7 @@ function ReservationModal({ deal, onClose, onConfirm }: {
           </div>
           <div className="flex items-center text-xs sm:text-sm text-gray-600">
             <Clock className="w-3 sm:w-4 h-3 sm:h-4 mr-1.5 text-orange-500" />
-            <span>Pickup: {deal.pickupTime}</span>
+            <span>Pickup by {deal.pickupTime}</span>
           </div>
 
           {/* What's Included Tooltip - Compact for mobile */}
@@ -1032,16 +1239,16 @@ function ReservationModal({ deal, onClose, onConfirm }: {
 }
 
 
-function CheckoutModal({ reservedDeals, customerInfo, onClose, onOrderComplete }: {
-  reservedDeals: Deal[];
+function CheckoutModal({ reservedDeals, customerInfo, onBack, onOrderComplete }: {
+  reservedDeals: {deal: Deal, quantity: number}[];
   customerInfo: {name: string; email: string; phone: string} | null;
-  onClose: () => void;
+  onBack: () => void;
   onOrderComplete: (orderDetails: any) => void;
 }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
-  const total = reservedDeals.reduce((sum, deal) => sum + deal.discountedPrice, 0);
+  const total = reservedDeals.reduce((sum, item) => sum + (item.deal.discountedPrice * item.quantity), 0);
 
   // Flutterwave configuration
   const flutterwaveConfig = customerInfo ? getFlutterwaveConfig({
@@ -1125,11 +1332,11 @@ function CheckoutModal({ reservedDeals, customerInfo, onClose, onOrderComplete }
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-3xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Checkout</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-50 rounded-xl transition-colors">
-            <X className="w-6 h-6 text-gray-400" />
+        <div className="flex items-center mb-6">
+          <button onClick={onBack} className="p-2 hover:bg-gray-50 rounded-xl transition-colors mr-3">
+            <ChevronLeft className="w-6 h-6 text-gray-600" />
           </button>
+          <h2 className="text-2xl font-bold text-gray-900">Checkout</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -1149,10 +1356,10 @@ function CheckoutModal({ reservedDeals, customerInfo, onClose, onOrderComplete }
           <div className="bg-gray-50 rounded-xl p-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-3">Order Summary</h3>
             <div className="space-y-2">
-              {reservedDeals.map((deal) => (
-                <div key={deal.id} className="flex justify-between">
-                  <span className="text-gray-600">{deal.title}</span>
-                  <span className="font-medium">₦{deal.discountedPrice.toLocaleString()}</span>
+              {reservedDeals.map((item) => (
+                <div key={item.deal.id} className="flex justify-between">
+                  <span className="text-gray-600">{item.deal.title} x{item.quantity}</span>
+                  <span className="font-medium">₦{(item.deal.discountedPrice * item.quantity).toLocaleString()}</span>
                 </div>
               ))}
               <div className="border-t pt-2 mt-2">
@@ -1171,7 +1378,7 @@ function CheckoutModal({ reservedDeals, customerInfo, onClose, onOrderComplete }
           <div className="flex space-x-4">
             <button
               type="button"
-              onClick={onClose}
+              onClick={onBack}
               className="flex-1 px-6 py-3 border-2 border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-semibold transition-all"
             >
               Back
@@ -1204,6 +1411,39 @@ function OrderConfirmationModal({ orderDetails, onClose }: {
   orderDetails: any;
   onClose: () => void;
 }) {
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+  const [showQrCode, setShowQrCode] = useState(false);
+
+  useEffect(() => {
+    // Generate QR code with pickup verification data
+    const generateQrCode = async () => {
+      try {
+        const qrData = JSON.stringify({
+          orderId: orderDetails.orderId,
+          pickupCode: orderDetails.pickupCode,
+          customerEmail: orderDetails.customerDetails?.email,
+          total: orderDetails.total,
+          timestamp: Date.now()
+        });
+
+        const qrCodeUrl = await QRCode.toDataURL(qrData, {
+          width: 200,
+          margin: 2,
+          color: {
+            dark: '#ea580c', // Orange
+            light: '#ffffff'
+          }
+        });
+
+        setQrCodeDataUrl(qrCodeUrl);
+      } catch (error) {
+        console.error('Error generating QR code:', error);
+      }
+    };
+
+    generateQrCode();
+  }, [orderDetails]);
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-3xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
@@ -1215,15 +1455,45 @@ function OrderConfirmationModal({ orderDetails, onClose }: {
           <p className="text-gray-600">Thank you for your purchase. Your deals have been reserved.</p>
         </div>
 
+        {/* QR Code Section */}
+        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-4 mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-orange-900">Pickup Verification</h3>
+            <button
+              onClick={() => setShowQrCode(!showQrCode)}
+              className="flex items-center space-x-2 text-orange-600 hover:text-orange-700 transition-colors"
+            >
+              <QrCode className="w-4 h-4" />
+              <span className="text-sm font-medium">{showQrCode ? 'Hide QR' : 'Show QR'}</span>
+            </button>
+          </div>
+
+          {showQrCode && qrCodeDataUrl && (
+            <div className="flex flex-col items-center space-y-3">
+              <div className="bg-white p-4 rounded-lg shadow-sm">
+                <img src={qrCodeDataUrl} alt="Pickup QR Code" className="w-32 h-32" />
+              </div>
+              <p className="text-xs text-orange-700 text-center max-w-sm">
+                Show this QR code to the restaurant staff for quick pickup verification
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div className="text-center p-3 bg-white rounded-lg">
+              <div className="text-sm text-gray-600">Order ID</div>
+              <div className="font-bold text-gray-900">{orderDetails.orderId}</div>
+            </div>
+            <div className="text-center p-3 bg-white rounded-lg">
+              <div className="text-sm text-gray-600">Pickup Code</div>
+              <div className="font-bold text-orange-900 text-xl">{orderDetails.pickupCode}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Details */}
         <div className="bg-gray-50 rounded-xl p-4 mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <span className="font-medium text-gray-700">Order ID</span>
-            <span className="font-bold text-gray-900">{orderDetails.orderId}</span>
-          </div>
-          <div className="flex justify-between items-center mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-            <span className="font-medium text-orange-700">Pickup Code</span>
-            <span className="font-bold text-orange-900 text-xl">{orderDetails.pickupCode}</span>
-          </div>
+          <h3 className="font-semibold text-gray-900 mb-3">Order Details</h3>
           <div className="space-y-2">
             {orderDetails.deals.map((deal: any) => (
               <div key={deal.id} className="flex items-center space-x-3 p-3 bg-white rounded-lg">
@@ -1231,13 +1501,14 @@ function OrderConfirmationModal({ orderDetails, onClose }: {
                   <ShoppingBag className="w-6 h-6 text-orange-500" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-gray-900">{deal.title}</h4>
-                  <p className="text-sm text-gray-600">{deal.vendor}</p>
-                  <p className="text-sm text-orange-500 font-medium">Pickup: {deal.pickupTime}</p>
-                  <p className="text-xs text-gray-500">{deal.address}</p>
+                  <h4 className="font-medium text-gray-900">{deal.deal.title}</h4>
+                  <p className="text-sm text-gray-600">{deal.deal.vendor}</p>
+                  <p className="text-sm text-orange-500 font-medium">Pickup by {deal.deal.pickupTime}</p>
+                  <p className="text-xs text-gray-500">{deal.deal.address}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold text-orange-600">₦{deal.discountedPrice.toLocaleString()}</p>
+                  <p className="text-xs text-gray-500">Qty: {deal.quantity}</p>
+                  <p className="font-bold text-orange-600">₦{(deal.deal.discountedPrice * deal.quantity).toLocaleString()}</p>
                 </div>
               </div>
             ))}
@@ -1250,13 +1521,14 @@ function OrderConfirmationModal({ orderDetails, onClose }: {
           </div>
         </div>
 
+        {/* Pickup Instructions */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-          <h3 className="font-semibold text-blue-900 mb-2">📱 Next Steps</h3>
+          <h3 className="font-semibold text-blue-900 mb-2">📱 Pickup Instructions</h3>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Show your pickup code at the restaurant</li>
             <li>• Arrive during the specified pickup times</li>
-            <li>• Provide your pickup code: <span className="font-bold">{orderDetails.pickupCode}</span></li>
-            <li>• Check your email for pickup instructions</li>
+            <li>• Show this QR code OR provide pickup code: <span className="font-bold">{orderDetails.pickupCode}</span></li>
+            <li>• Bring a valid ID for verification</li>
+            <li>• Contact the restaurant if you need assistance</li>
           </ul>
         </div>
 
@@ -1428,12 +1700,12 @@ function DealSection({ title, deals, favorites, onToggleFavorite, onReserve, res
         <div className="flex space-x-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
           {deals.map((deal) => (
             <DealCardMobile
-              key={deal.id}
+              key={`${sectionId}-${deal.id}`}
               deal={deal}
               isFavorite={favorites.includes(deal.id)}
               onToggleFavorite={() => onToggleFavorite(deal.id)}
               onReserve={() => onReserve(deal)}
-              isReserved={reservedDeals.includes(deal.id)}
+              isReserved={reservedDeals.some(item => item.id === deal.id)}
             />
           ))}
         </div>
@@ -1464,12 +1736,12 @@ function DealSection({ title, deals, favorites, onToggleFavorite, onReserve, res
         >
           {deals.map((deal) => (
             <DealCard
-              key={deal.id}
+              key={`${sectionId}-${deal.id}`}
               deal={deal}
               isFavorite={favorites.includes(deal.id)}
               onToggleFavorite={() => onToggleFavorite(deal.id)}
               onReserve={() => onReserve(deal)}
-              isReserved={reservedDeals.includes(deal.id)}
+              isReserved={reservedDeals.some(item => item.id === deal.id)}
             />
           ))}
         </div>

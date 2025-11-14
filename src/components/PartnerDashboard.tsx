@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, TrendingUp, Users, DollarSign, Plus, Clock, Edit, Trash2, ChevronLeft, BarChart3, Calendar, X, Upload, Image, RotateCcw, Copy, Bell } from 'lucide-react';
+import { Package, TrendingUp, Users, DollarSign, Plus, Clock, Edit, Trash2, ChevronLeft, BarChart3, Calendar, X, Upload, Image, RotateCcw, Copy, Bell, QrCode, Scan } from 'lucide-react';
 import Logo from './Logo';
 import { usePartnerAuth } from '../contexts/PartnerAuthContext';
 import PartnerAuth from './PartnerAuth';
@@ -101,6 +101,8 @@ export default function PartnerDashboard({ onNavigate }: PartnerDashboardProps) 
   const [pickupError, setPickupError] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanMode, setScanMode] = useState<'manual' | 'qr'>('manual');
 
   // Load dashboard data when partner is available
   useEffect(() => {
@@ -182,6 +184,40 @@ export default function PartnerDashboard({ onNavigate }: PartnerDashboardProps) 
       setVerifiedOrder(null);
     } finally {
       setPickupLoading(false);
+    }
+  };
+
+  const handleQrScan = (qrData: string) => {
+    try {
+      // Try to parse QR data
+      const data = JSON.parse(qrData);
+      if (data.pickupCode && data.orderId) {
+        setPickupCode(data.pickupCode);
+        // Auto-verify the order
+        setTimeout(() => {
+          verifyPickupCode();
+        }, 100);
+      } else {
+        setPickupError('Invalid QR code format');
+      }
+    } catch {
+      // If it's not JSON, assume it's just a pickup code
+      if (qrData.length === 4 && /^\d{4}$/.test(qrData)) {
+        setPickupCode(qrData);
+        setTimeout(() => {
+          verifyPickupCode();
+        }, 100);
+      } else {
+        setPickupError('Invalid QR code or pickup code');
+      }
+    }
+  };
+
+  const toggleScanning = () => {
+    setIsScanning(!isScanning);
+    if (!isScanning) {
+      // Clear any previous errors when starting to scan
+      setPickupError(null);
     }
   };
 
@@ -603,38 +639,122 @@ export default function PartnerDashboard({ onNavigate }: PartnerDashboardProps) 
               <h2 className="text-3xl font-bold text-gray-900 mb-2">Order Pickup Verification</h2>
               <p className="text-gray-600 mb-8">Verify customer pickup codes and mark orders as collected</p>
 
-              {/* Pickup Code Input */}
+              {/* Mode Toggle */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Customer Pickup Code
-                </label>
-                <div className="flex space-x-3">
-                  <input
-                    type="text"
-                    value={pickupCode}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
-                      setPickupCode(value);
-                      if (pickupError) setPickupError(null);
-                      if (verifiedOrder) setVerifiedOrder(null);
-                    }}
-                    placeholder="Enter 4-digit code"
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-center text-xl font-mono tracking-widest"
-                    maxLength={4}
-                  />
+                <div className="flex space-x-2 p-1 bg-gray-100 rounded-lg">
                   <button
-                    onClick={verifyPickupCode}
-                    disabled={pickupLoading || pickupCode.length !== 4}
-                    className="px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 disabled:bg-gray-300 transition-all flex items-center space-x-2"
+                    onClick={() => setScanMode('manual')}
+                    className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-md transition-colors ${
+                      scanMode === 'manual'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
                   >
-                    {pickupLoading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      'Verify'
-                    )}
+                    <span>Manual Entry</span>
+                  </button>
+                  <button
+                    onClick={() => setScanMode('qr')}
+                    className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-md transition-colors ${
+                      scanMode === 'qr'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <QrCode className="w-4 h-4" />
+                    <span>QR Scanner</span>
                   </button>
                 </div>
               </div>
+
+              {/* QR Scanner Section */}
+              {scanMode === 'qr' && (
+                <div className="mb-6">
+                  <div className="aspect-square max-w-sm mx-auto bg-gray-100 rounded-lg flex items-center justify-center mb-4">
+                    {isScanning ? (
+                      <div className="text-center">
+                        <div className="animate-pulse">
+                          <QrCode className="w-16 h-16 text-orange-500 mx-auto mb-2" />
+                          <p className="text-gray-600">Scanning for QR codes...</p>
+                          <p className="text-sm text-gray-500 mt-1">Point camera at customer's QR code</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <QrCode className="w-16 h-16 text-gray-300 mx-auto mb-2" />
+                        <p className="text-gray-500">Camera preview</p>
+                        <p className="text-sm text-gray-400">Start scanning to activate camera</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={toggleScanning}
+                      className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-semibold transition-colors ${
+                        isScanning
+                          ? 'bg-red-500 text-white hover:bg-red-600'
+                          : 'bg-orange-500 text-white hover:bg-orange-600'
+                      }`}
+                    >
+                      <Scan className="w-5 h-5" />
+                      <span>{isScanning ? 'Stop Scanning' : 'Start QR Scan'}</span>
+                    </button>
+                  </div>
+
+                  {/* Mock QR scan for testing */}
+                  {isScanning && (
+                    <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm font-semibold text-blue-900 mb-2">For Testing:</p>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleQrScan('{"orderId":"SL-ABC123","pickupCode":"4729","customerEmail":"test@example.com","total":1500,"timestamp":1641234567890}')}
+                          className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                        >
+                          Test QR Code 1
+                        </button>
+                        <button
+                          onClick={() => handleQrScan('8361')}
+                          className="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
+                        >
+                          Test Code 2
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Manual Entry Section */}
+              {scanMode === 'manual' && (
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Customer Pickup Code
+                  </label>
+                  <div className="flex space-x-3">
+                    <input
+                      type="text"
+                      value={pickupCode}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
+                        setPickupCode(value);
+                        if (pickupError) setPickupError(null);
+                        if (verifiedOrder) setVerifiedOrder(null);
+                      }}
+                      placeholder="Enter 4-digit code"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-center text-xl font-mono tracking-widest"
+                      maxLength={4}
+                    />
+                    <button
+                      onClick={verifyPickupCode}
+                      disabled={pickupCode.length !== 4 || pickupLoading}
+                      className="px-6 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      {pickupLoading ? 'Verifying...' : 'Verify'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
 
               {/* Error Message */}
               {pickupError && (
