@@ -1,109 +1,107 @@
-# Slash Foods 🍲
+# Tronic Lab 🚀
 
-**Too Good To Go for Nigeria** - Save Food. Save Money.
+**Building the Next Generation of Nigerian Tech Innovators**
 
-Slash Foods is a mobile app that connects users with restaurants offering surprise packs of delicious leftover food at amazing discounted prices (₦500-₦1,000). Help reduce food waste while enjoying quality meals!
+Tronic Lab is a STEM education company that partners with Nigerian schools to teach children robotics, AI, coding, 3D printing, and app development through hands-on, interactive sessions during school hours.
 
-## Features
+## Our Mission
 
-### User Features ✨
-- 🔐 User authentication (sign up/login)
-- 🏠 Browse available food packs from local restaurants
-- 🔍 Search and filter by location (Lekki, VI, Ikeja, etc.)
-- 📦 View detailed information about surprise packs
-- 💰 Reserve packs at 50-70% discount
-- 📱 Unique pickup codes for order verification
-- 📋 Order history and tracking
-- 👤 User profile management
+Transform Nigerian education by making cutting-edge technology education accessible, engaging, and immediately rewarding. Every student builds something they can take home from Day 1!
 
-### Business Model 💼
-- **Target Areas**: Lekki, VI, Ikeja, Yaba, Surulere (Lagos)
-- **Price Range**: ₦500 - ₦1,000 per surprise pack
-- **Pickup Window**: 7:00 PM - 9:00 PM
-- **Commission**: ₦200-₦300 per pack
-- **Potential Revenue**: ₦1.5M/month (20 restaurants × 10 packs/day)
+## Programs
+
+### 🎨 Young Makers Lab (Ages 9-12)
+**Primary Level Program**
+
+Students build:
+- ⚡ Light-up circuits & LED art
+- 🤖 Vibrating art bots
+- 🎤 Voice-controlled games
+- 📱 Mobile apps on real phones
+- 🎨 3D-printed designs
+- ⚙️ Catapults & gear systems
+
+**Duration:** 12 weeks (2x/week, 1 hour sessions)
+**Pricing:** ₦35,000 - ₦90,000 (depending on school tier)
+
+### 🚀 Future Engineers Lab (Ages 12-15)
+**JSS Level Program**
+
+Students build:
+- 🤖 Arduino robots & sensors
+- 🎨 Precision 3D designs
+- 🎙️ AI-powered apps with voice coding
+- 📱 Advanced mobile apps with Firebase
+- 🌐 IoT & WiFi-controlled systems
+- 🚦 Smart devices & automation
+
+**Duration:** 12 weeks (2x/week, 1 hour sessions)
+**Pricing:** ₦50,000 - ₦120,000 (depending on school tier)
+
+## Why Partner With Us?
+
+### For Schools
+- ✅ **Zero Prep Required** - We bring ALL equipment and expert instructors
+- 📚 **Curriculum-Aligned** - Meets Nigeria's 2025 STEM requirements
+- 💰 **Revenue Sharing** - Earn 15-25% (₦130k-₦750k per term with 25 students)
+- 🏆 **STEM Leader Status** - Boost your school's reputation
+- 📸 **Marketing Content** - Weekly photos/videos for your social media
+- 🎓 **Showcase Events** - Parents see projects at final Maker Showcase
+
+### For Parents
+- ✨ Child builds real projects (not just theory)
+- 📱 Weekly WhatsApp photo updates
+- 🎯 Portfolio of 20+ completed projects
+- 🎓 Professional certificates
+- 🚀 Future-ready tech skills
+
+### For Students
+- 🎮 Make something cool EVERY class
+- 🤖 Learn by doing, not lectures
+- 🌟 Show off projects to friends and family
+- 💡 Build apps, robots, and 3D designs
 
 ## Tech Stack
 
-- **Frontend**: React Native (Expo) + TypeScript
-- **Backend**: Supabase (PostgreSQL + Auth + Real-time)
-- **Navigation**: React Navigation (Stack + Bottom Tabs)
+This website is built with:
+- **Framework**: React Native (Expo) - Web target
+- **Language**: TypeScript
 - **UI Library**: React Native Paper
-- **State Management**: React Hooks
+- **Platform**: Cross-platform (Web, iOS, Android)
 
-## Prerequisites
+## Getting Started
 
-Before you begin, ensure you have:
+### Prerequisites
 - Node.js (v18 or higher)
 - npm or yarn
-- Expo CLI (`npm install -g expo-cli`)
-- A Supabase account (free tier works!)
+- Expo CLI
 
-## Installation
+### Installation
 
-### 1. Clone the Repository
-
+1. Clone the repository:
 ```bash
 git clone <repository-url>
 cd slashfoods
 ```
 
-### 2. Install Dependencies
-
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-### 3. Set Up Supabase
-
-#### a) Create a Supabase Project
-1. Go to [Supabase](https://supabase.com)
-2. Sign up or log in
-3. Click "New Project"
-4. Fill in project details and wait for setup to complete
-
-#### b) Run Database Schema
-1. Go to your Supabase project dashboard
-2. Click on "SQL Editor" in the left sidebar
-3. Open the `supabase-schema.sql` file from this project
-4. Copy and paste the entire SQL content into the SQL Editor
-5. Click "Run" to create all tables and policies
-
-#### c) Get Your API Credentials
-1. Go to Project Settings → API
-2. Copy your:
-   - Project URL (e.g., `https://xxxxx.supabase.co`)
-   - `anon` public key
-
-### 4. Configure Environment Variables
-
-Create a `.env` file in the root directory:
-
+3. Run the development server:
 ```bash
-cp .env.example .env
-```
-
-Edit `.env` and add your Supabase credentials:
-
-```env
-EXPO_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
-```
-
-### 5. Run the App
-
-```bash
-# Start the development server
 npm start
+```
 
-# Run on Android
-npm run android
-
-# Run on iOS (Mac only)
-npm run ios
-
-# Run on web
+4. View the website:
+```bash
+# For web
 npm run web
+
+# For mobile (optional)
+npm run android
+npm run ios
 ```
 
 ## Project Structure
@@ -111,127 +109,82 @@ npm run web
 ```
 slashfoods/
 ├── src/
-│   ├── components/          # Reusable components
-│   │   └── FoodPackCard.tsx
-│   ├── config/             # Configuration files
-│   │   └── supabase.ts     # Supabase client setup
-│   ├── navigation/         # Navigation setup
-│   │   └── AppNavigator.tsx
-│   ├── screens/            # App screens
-│   │   ├── WelcomeScreen.tsx
-│   │   ├── LoginScreen.tsx
-│   │   ├── SignUpScreen.tsx
-│   │   ├── HomeScreen.tsx
-│   │   ├── FoodPackDetailsScreen.tsx
-│   │   ├── OrdersScreen.tsx
-│   │   └── ProfileScreen.tsx
-│   ├── services/           # API services
-│   │   ├── auth.ts
-│   │   └── foodPacks.ts
-│   ├── types/              # TypeScript types
-│   │   └── index.ts
-│   └── utils/              # Utility functions
-│       └── currency.ts
-├── App.tsx                 # App entry point
+│   └── components/
+│       ├── Hero.tsx                    # Hero section with CTA
+│       ├── Programs.tsx                # Program details (Primary & JSS)
+│       ├── CurriculumHighlights.tsx   # Key features showcase
+│       ├── PartnershipBenefits.tsx    # School partnership benefits
+│       ├── Contact.tsx                 # Contact form
+│       └── Footer.tsx                  # Footer with links
+├── App.tsx                             # Main app component
 ├── package.json
 └── README.md
 ```
 
-## Database Schema
+## Key Features
 
-### Tables
+### 🎯 Hands-On from Day 1
+No boring lectures! Students build working projects in the very first session.
 
-1. **users** - User profiles
-2. **restaurants** - Restaurant information
-3. **food_packs** - Available food packs
-4. **orders** - User orders
+### 🎤 AI-Powered Learning
+Voice coding and AI-assisted programming - the future of software development.
 
-### Key Features
-- Row Level Security (RLS) enabled
-- User authentication via Supabase Auth
-- Real-time data synchronization
-- Automatic quantity management
+### 📱 Real-World Projects
+Mobile apps, 3D designs, and Arduino systems. Portfolio-ready work!
 
-## Sample Data
+### 🤖 Robotics & Hardware
+Build robots, design circuits, program Arduino, create IoT devices.
 
-The `supabase-schema.sql` includes sample restaurants. To add sample food packs:
+### 🎨 3D Design & Printing
+Learn Tinkercad. Top projects get 3D printed!
 
-1. Go to Supabase SQL Editor
-2. Get restaurant IDs from the restaurants table
-3. Uncomment and run the sample food packs INSERT statement (update the dates)
+### 📊 Showcase & Certificates
+Capstone Maker Showcase + certificates + 20+ completed projects!
 
-Or add them manually via the Supabase Table Editor.
+## Partnership Tiers
 
-## Usage
+| Tier | Price (Primary) | Price (JSS) | School Revenue Share |
+|------|----------------|-------------|---------------------|
+| **High-End Private** | ₦90,000 | ₦120,000 | 25% (₦22.5k-₦30k per student) |
+| **Mid-Range Private** | ₦60,000 | ₦80,000 | 20% (₦12k-₦16k per student) |
+| **Budget Private** | ₦35,000 | ₦50,000 | 15% (₦5.25k-₦7.5k per student) |
 
-### For Users
+*12-week programs*
 
-1. **Sign Up**: Create an account with email and password
-2. **Browse**: View available food packs on the home screen
-3. **Search**: Filter by restaurant name or location
-4. **Reserve**: Select a pack and confirm your reservation
-5. **Pickup**: Use your unique pickup code at the restaurant
+## Contact
 
-### For Restaurant Partners (Coming Soon)
+- **Email**: hello@troniclab.ng
+- **WhatsApp**: +234 XXX XXX XXXX
+- **Location**: Lagos, Nigeria
+- **Instagram**: @troniclab
+- **Twitter**: @troniclab
 
-Restaurant dashboard to:
-- Add daily food packs
-- Manage inventory
-- Verify pickup codes
-- Track sales
+## Our Promise
 
-## Roadmap
+> "Every student makes something that lights up, moves, or works on the very first day!"
 
-- [ ] Payment integration (Paystack/Flutterwave)
-- [ ] Restaurant dashboard/portal
-- [ ] Push notifications
-- [ ] In-app messaging
-- [ ] Rating and reviews
-- [ ] Referral program
-- [ ] Analytics dashboard
-- [ ] Multiple payment methods
-- [ ] iOS App Store release
-- [ ] Google Play Store release
+## Success Stats
 
-## Business Launch Plan
+- 📚 **100+ Students Trained**
+- 🏫 **6 Years of Manufacturing Experience**
+- 🎯 **20+ Projects Per Student**
+- 💯 **100% Hands-On Learning**
 
-### Phase 1: Validation (Month 1-2)
-- Partner with 20-30 restaurants in Lekki/VI/Ikeja
-- Launch on Instagram for marketing
-- Manual operations and order management
-- Cost: ₦200K-₦400K
+## How It Works
 
-### Phase 2: App Launch (Month 3)
-- Release mobile app
-- Automate order processing
-- Expand to 50+ restaurants
-
-### Phase 3: Scale (Month 4+)
-- Expand to other Lagos areas
-- Add restaurant self-service portal
-- Implement payment processing
-- Target: ₦1.5M+ monthly revenue
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+1. **Schedule Demo** - Free 30-min demo at your school
+2. **Sign Agreement** - Choose tier and set schedule
+3. **We Handle Everything** - Equipment, instruction, updates
+4. **You Earn & Grow** - Revenue share + enhanced reputation
 
 ## License
 
-This project is licensed under the MIT License.
+This project is proprietary and confidential.
 
-## Support
+## Built With ❤️
 
-For questions or support, please contact:
-- Email: support@slashfoods.ng
-- Instagram: @slashfoods
-
-## Acknowledgments
-
-Inspired by Too Good To Go - the world's leading food waste reduction app.
+Built with love for Nigerian students by the Tronic Lab team.
 
 ---
 
-**Built with ❤️ for Nigeria**
-
-Save food. Save money. Save the planet. 🌍
+🚀 **Ready to transform your school? [Contact us](mailto:hello@troniclab.ng) today!**
